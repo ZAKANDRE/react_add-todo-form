@@ -1,6 +1,5 @@
-import usersFromServer from '../api/users';
 import { User } from '../types/user';
 
-export const getUserById = (userId: number): User | null => {
-  return usersFromServer.find(user => user.id === userId) || null;
+export const getUserById = (users: User[], userId: number): User | null => {
+  return users.find(user => user.id === userId) || null;
 };

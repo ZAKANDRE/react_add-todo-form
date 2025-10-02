@@ -8,26 +8,29 @@ import { Todo } from './types/todos';
 export const App = () => {
   const [todos, setTodos] = useState<Todo[]>(() =>
     todosFromServer.map(todo => {
-      const user = usersFromServer.find(u => u.id === todo.userId)!;
+      const user = usersFromServer.find(
+        userItem => userItem.id === todo.userId,
+      )!;
 
       return { ...todo, user };
-    })
+    }),
   );
 
   const addTodo = (title: string, userId: number) => {
-    const user = usersFromServer.find(u => u.id === userId);
-    if (!user) return;
+    const userItem = usersFromServer.find(item => item.id === userId);
 
-    const newId = todos.length > 0
-      ? Math.max(...todos.map(t => t.id)) + 1
-      : 1;
+    if (!userItem) {
+      return;
+    }
+
+    const newId = todos.length > 0 ? Math.max(...todos.map(t => t.id)) + 1 : 1;
 
     const newTodo: Todo = {
       id: newId,
       title,
       completed: false,
       userId,
-      user,
+      user: userItem,
     };
 
     setTodos(prev => [...prev, newTodo]);
@@ -40,4 +43,3 @@ export const App = () => {
     </div>
   );
 };
-

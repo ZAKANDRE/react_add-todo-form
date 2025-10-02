@@ -14,8 +14,8 @@ export const TodoInfo = ({ users, todos, onAddTodo }: Props) => {
   const [errorTitle, setErrorTitle] = useState('');
   const [errorUser, setErrorUser] = useState('');
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
     const isTitleValid = title.trim() !== '';
     const isUserValid = userId > 0;
@@ -23,7 +23,9 @@ export const TodoInfo = ({ users, todos, onAddTodo }: Props) => {
     setErrorTitle(isTitleValid ? '' : 'Please enter a title');
     setErrorUser(isUserValid ? '' : 'Please choose a user');
 
-    if (!isTitleValid || !isUserValid) return;
+    if (!isTitleValid || !isUserValid) {
+      return;
+    }
 
     onAddTodo(title.trim(), userId);
 
@@ -42,9 +44,11 @@ export const TodoInfo = ({ users, todos, onAddTodo }: Props) => {
             data-cy="titleInput"
             placeholder="Enter a title"
             value={title}
-            onChange={(e) => {
-              setTitle(e.target.value);
-              if (e.target.value.trim()) {
+            onChange={changeEvent => {
+              const newValue = changeEvent.target.value;
+
+              setTitle(newValue);
+              if (newValue.trim()) {
                 setErrorTitle('');
               }
             }}
@@ -58,8 +62,9 @@ export const TodoInfo = ({ users, todos, onAddTodo }: Props) => {
             id="selectUser"
             data-cy="userSelect"
             value={userId}
-            onChange={(e) => {
+            onChange={e => {
               const id = +e.target.value;
+
               setUserId(id);
               if (id > 0) {
                 setErrorUser('');
@@ -76,7 +81,9 @@ export const TodoInfo = ({ users, todos, onAddTodo }: Props) => {
           <span className="error">{errorUser}</span>
         </div>
 
-        <button type="submit" data-cy="submitButton">Add</button>
+        <button type="submit" data-cy="submitButton">
+          Add
+        </button>
       </form>
 
       <section className="TodoList">
