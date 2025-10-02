@@ -5,15 +5,13 @@ import { User } from '../../types/user';
 type Props = {
   users: User[];
   todos: Todo[];
+  onAddTodo: (title: string, userId: number) => void;
 };
-export const TodoList = ({ users, todos }: Props) => {
-  // const addPost = (newTodo: Todo) => {
-  //     setTodosList(current => [...current, newTodo])
-  // }
 
+export const TodoList = ({ users, todos, onAddTodo }: Props) => {
   return (
     <>
-      <TodoInfo user={users} todo={todos} />
+      <TodoInfo users={users} todos={todos} onAddTodo={onAddTodo} />
     </>
   );
 };

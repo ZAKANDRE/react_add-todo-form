@@ -1,82 +1,39 @@
 import { Todo } from '../../types/todos';
 import { User } from '../../types/user';
-import { getUserById } from '../../services/users';
 import { useState } from 'react';
 
 type Props = {
-  user: User[];
-  todo: Todo[];
+  users: User[];
+  todos: Todo[];
+  onAddTodo: (title: string, userId: number) => void;
 };
 
-export const TodoInfo = ({ user, todo }: Props) => {
-  // export const TodoInfo = ({user, todo, onSubmit}: Props ) => {
-  const [title, seTitle] = useState<string>('');
-  const [hasErrorTitle, setHasErrorTitle] = useState<string>('');
-  const [hasSelectUser, setHasSelectUser] = useState<string>('');
-  const [hasIdUser, setHasIdUser] = useState<number>(0);
-  const [todosList, setTodosList] = useState<Todo[]>([...todo]);
+export const TodoInfo = ({ users, todos, onAddTodo }: Props) => {
+  const [title, setTitle] = useState('');
+  const [userId, setUserId] = useState(0);
+  const [errorTitle, setErrorTitle] = useState('');
+  const [errorUser, setErrorUser] = useState('');
 
-  const maxNum = (list: Todo[]) => {
-    const newId = Math.max(...list.map(todoList => +todoList.id));
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-    return newId + 1;
-  };
+    const isTitleValid = title.trim() !== '';
+    const isUserValid = userId > 0;
 
-  const reset = () => {
-    seTitle('');
-    setHasSelectUser('');
-    setHasIdUser(0);
-  };
-
-  const addTodo = (newTitle: string, userId: number) => {
-    const newTodo = {
-      id: maxNum(todosList),
-      title: newTitle,
-      completed: false,
-      userId,
-    };
-
-    setTodosList(current => [...current, newTodo]);
-  };
-
-  const handleSubmitForm = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    const isTitleValid = title.trim().length > 0;
-    const isUserValid = hasIdUser > 0;
-
-    setHasErrorTitle(isTitleValid ? '' : 'Please enter a title');
-    setHasSelectUser(isUserValid ? '' : 'Please choose a user');
+    setErrorTitle(isTitleValid ? '' : 'Please enter a title');
+    setErrorUser(isUserValid ? '' : 'Please choose a user');
 
     if (!isTitleValid || !isUserValid) return;
 
-    addTodo(title, Number(hasIdUser));
-    reset();
-  };
+    onAddTodo(title.trim(), userId);
 
-  const inputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-
-    seTitle(value);
-
-    if (value.trim().length > 0) {
-      setHasErrorTitle('');
-    }
-  };
-
-  const selectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = +event.target.value;
-
-    setHasIdUser(value);
-
-    if (value > 0) {
-      setHasSelectUser('');
-    }
+    setTitle('');
+    setUserId(0);
   };
 
   return (
     <div>
-      <form action="/api/todos" method="POST" onSubmit={handleSubmitForm}>
+      <form onSubmit={handleSubmit}>
         <div className="field">
           <label htmlFor="titleInput">Title: </label>
           <input
@@ -85,63 +42,56 @@ export const TodoInfo = ({ user, todo }: Props) => {
             data-cy="titleInput"
             placeholder="Enter a title"
             value={title}
-            onChange={inputChange}
+            onChange={(e) => {
+              setTitle(e.target.value);
+              if (e.target.value.trim()) {
+                setErrorTitle('');
+              }
+            }}
           />
-          <span className="error">{hasErrorTitle}</span>
+          <span className="error">{errorTitle}</span>
         </div>
 
         <div className="field">
           <label htmlFor="selectUser">User: </label>
-
           <select
-            data-cy="userSelect"
             id="selectUser"
-            value={hasIdUser}
-            onChange={selectChange}
-          >
-            <option value="0">Choose a user</option>
-
-            {user.map(userData => {
-              const userInfo = getUserById(userData.id);
-
-              if (!userInfo) {
-                return null;
+            data-cy="userSelect"
+            value={userId}
+            onChange={(e) => {
+              const id = +e.target.value;
+              setUserId(id);
+              if (id > 0) {
+                setErrorUser('');
               }
-
-              return (
-                <option key={userInfo.id} value={userInfo.id}>
-                  {userInfo.name}
-                </option>
-              );
-            })}
+            }}
+          >
+            <option value={0}>Choose a user</option>
+            {users.map(user => (
+              <option key={user.id} value={user.id}>
+                {user.name}
+              </option>
+            ))}
           </select>
-          <span className="error">{hasSelectUser}</span>
+          <span className="error">{errorUser}</span>
         </div>
 
-        <button type="submit" data-cy="submitButton">
-          Add
-        </button>
+        <button type="submit" data-cy="submitButton">Add</button>
       </form>
 
       <section className="TodoList">
-        {todosList.map(post => {
-          const nameUser = getUserById(post.userId);
-
-          return (
-            <article
-              key={post.id}
-              data-id={post.id}
-              className={`TodoInfo ${post.completed ? 'TodoInfo--completed' : ''}`}
-            >
-              <h2 className="TodoInfo__title">{post.title}</h2>
-              {nameUser && (
-                <a className="UserInfo" href={`mailto:${nameUser?.email}`}>
-                  {nameUser?.name}
-                </a>
-              )}
-            </article>
-          );
-        })}
+        {todos.map(todo => (
+          <article
+            key={todo.id}
+            data-id={todo.id}
+            className={`TodoInfo ${todo.completed ? 'TodoInfo--completed' : ''}`}
+          >
+            <h2 className="TodoInfo__title">{todo.title}</h2>
+            <a className="UserInfo" href={`mailto:${todo.user.email}`}>
+              {todo.user.name}
+            </a>
+          </article>
+        ))}
       </section>
     </div>
   );
