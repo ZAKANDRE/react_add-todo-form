@@ -42,17 +42,13 @@ export const TodoInfo = ({ user, todo }: Props) => {
   const handleSubmitForm = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (title.trim().length < 1) {
-      setHasErrorTitle('Please enter a title');
-    } else {
-      setHasErrorTitle('');
-    }
+    const isTitleValid = title.trim().length > 0;
+    const isUserValid = hasIdUser > 0;
 
-    if (hasIdUser < 1) {
-      setHasSelectUser('Please choose a user');
-    } else {
-      setHasSelectUser('');
-    }
+    setHasErrorTitle(isTitleValid ? '' : 'Please enter a title');
+    setHasSelectUser(isUserValid ? '' : 'Please choose a user');
+
+    if (!isTitleValid || !isUserValid) return;
 
     addTodo(title, Number(hasIdUser));
     reset();
@@ -63,7 +59,7 @@ export const TodoInfo = ({ user, todo }: Props) => {
 
     seTitle(value);
 
-    if (title.trim().length > 0) {
+    if (value.trim().length > 0) {
       setHasErrorTitle('');
     }
   };
@@ -135,11 +131,11 @@ export const TodoInfo = ({ user, todo }: Props) => {
             <article
               key={post.id}
               data-id={post.id}
-              className="TodoInfo TodoInfo--completed"
+              className={`TodoInfo ${post.completed ? 'TodoInfo--completed' : ''}`}
             >
               <h2 className="TodoInfo__title">{post.title}</h2>
               {nameUser && (
-                <a className="UserInfo" href="mailto:Sincere@april.biz">
+                <a className="UserInfo" href={`mailto:${nameUser?.email}`}>
                   {nameUser?.name}
                 </a>
               )}
