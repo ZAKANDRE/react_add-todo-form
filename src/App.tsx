@@ -1,16 +1,35 @@
 import './App.scss';
+import { TodoList } from './components/TodoList';
 
-// import usersFromServer from './api/users';
-// import todosFromServer from './api/todos';
+import usersFromServer from './api/users';
+import todosFromServer from './api/todos';
 
 export const App = () => {
   return (
+    <>
+      <div className="App">
+        <h1>Add todo form</h1>
+
+        <TodoList users={usersFromServer} todos={todosFromServer} />
+      </div>
+    </>
+  );
+
+  /*
+  return (
     <div className="App">
+    <TodoList users={usersFromServer} todos={todosFromServer}/>
+    
       <h1>Add todo form</h1>
 
       <form action="/api/todos" method="POST">
         <div className="field">
-          <input type="text" data-cy="titleInput" />
+          <input 
+              type="text" 
+              data-cy="titleInput"
+              value={title}
+              onChange={(event)=>{seTitle(event.target.value)}}
+          />
           <span className="error">Please enter a title</span>
         </div>
 
@@ -19,6 +38,7 @@ export const App = () => {
             <option value="0" disabled>
               Choose a user
             </option>
+
           </select>
 
           <span className="error">Please choose a user</span>
@@ -58,4 +78,6 @@ export const App = () => {
       </section>
     </div>
   );
+  
+  */
 };
